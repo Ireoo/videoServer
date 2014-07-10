@@ -12,14 +12,15 @@ var http = require('http'),
     o  = require('util'),
     server;
 
-server = http.createServer(function(req, res){
+server = http.createServer(function(req, res) {
     req.setEncoding(encoding="utf8");
     var path = url.parse(req.url).pathname;
-    o.log(path);   
+
 
     if(path == '/') path = '/index.html';
 
-    fs.readFile(__dirname + path, function(err, data){
+    fs.readFile(__dirname + path, function(err, data) {
+        o.log('[' + __dirname + path + ']状态: ' + String(err));
         if (err) return send404(res);
         res.writeHead(200, {'Content-Type': path.substr(path.length - 2) == 'js' ? 'text/javascript, charset=UTF-8' : 'text/html, charset=UTF-8'});
         res.write(data, 'utf8');
@@ -29,7 +30,7 @@ server = http.createServer(function(req, res){
 
 send404 = function(res){
     res.writeHead(404);
-    res.write('404 Not Found');
+    res.write('<b>404 Not Found</b>');
     res.end();
 };
 
@@ -37,7 +38,6 @@ server.listen(8000);
 
 var players = [];
 var s = [];
-var list = [];
 var videos = [];
 
 var io = require('socket.io')(server);
