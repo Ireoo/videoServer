@@ -1,0 +1,23 @@
+{
+  "name": "chatServer",
+  "description": "chat for server",
+  "version": "0.0.1",
+  "engines": {
+    "node": ">= 0.6.0"
+  },
+  "dependencies": {
+    "webrtc.io": "latest",
+    "socket.io": "latest"
+  },
+  "subdomain": "chatServer",
+  "scripts": {
+    "start": "sNew.js"
+  },
+  "author": "S2",
+  "contributors": [
+    {
+      "name": "S2",
+      "email": "s@ireoo.com"
+    }
+  ]
+}
