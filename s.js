@@ -38,7 +38,7 @@ server.listen(8000);
 
 var players = [];
 var s = [];
-var rooms = [];
+var _rooms = [];
 var list = [];
 var videos = [];
 
@@ -129,21 +129,19 @@ io.sockets.on('connection', function(socket){
     socket.on('login', function(user) {
         try
         {
-            //if(!isNaN(room[user.room])) room[user.room] = 0;
-            //room[user.room] += 1;
+
             o.log('正在发送用户列表给新用户...');
             socket.emit('getplayers', list);
             o.log('用户列表发送完成!');
             user.id = socket.id;
             players[socket.id] = user;
             s[socket.id] = socket;
-              
             user.id = socket.id;
             list.push(user);
-              
             socket.emit('login', socket.id);
             socket.broadcast.emit('loginIn', user);
             o.log('用户 ' + user.name + ' 进入 ' + user.room + ' 了！当前在线人数：' + String(list.length)); //房间 ' + players[socket.id].room + ' 在线人数: ' + String(room[user.room]) + ',
+
         }catch(e){o.log(e.stack);}
     });
 
@@ -177,4 +175,3 @@ var webRTC = require('webrtc.io').listen(8001);
 
 o.log('服务器已经启动，开始监听8000端口!');
 o.log('视频服务器已经启动，开始监听8001端口!');
-
