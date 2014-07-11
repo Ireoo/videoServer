@@ -35,51 +35,29 @@ send404 = function(res){
 
 server.listen(8000);
 
-var players = [];
-var s = [];
-var list = [];
+var users = [];
 var videos = [];
 
 var io = require('socket.io')(server);
 io.set('log level', 1);
-io.sockets.on('connection', function(socket){
-    socket.on('say to one',function(data){
-        try
-        {
-            o.log(players[socket.id].name + ' to ' + players[data.tid].name + ' : ' + data.msg);
-            data.timer = (new Date()).getTime();
-            var d = data;
-            d.socketid = players[socket.id].name;
-            d.avatar = players[socket.id].avatar;
-            socket.emit('say to me', d);
-            var d = data;
-            d.id = players[data.tid].name;
-            d.lid = players[socket.id].name;
-            d.socketid = socket.id;
-            d.avatar = players[socket.id].avatar;
-            s[data.tid].emit('say to one', d);
-        }catch(e){o.log(e.stack);}
-    });
+io.on('connection', function(socket){
+
+    //普通聊天
     socket.on('say to everyone',function(data){
         try
         {
-            o.log(socket.user.name + ' say: ' + data.msg);
+
+            data.name = socket.user.name;
+            data.avatar = socket.user.avatar;
+            data.ip = socket.handshake.address.address;
+            data.time = socket.handshake.time;
             socket.broadcast.to(socket.user.room).emit('say to everyone', data);
+            o.log(socket.user.name + ' say: ' + data.msg);
 
         }catch(e){o.log(e.stack);}
     });
 
-    socket.on('sendboss', function(data){
-        try
-        {
-
-            o.log('主播进入，开始直播！');
-            socket.broadcast.emit('getboss', data);
-            o.log(data);
-
-        }catch(e){o.log(e.stack);}
-    });
-
+    //系统信息
     socket.on('system', function(data){
         try
         {
@@ -87,46 +65,45 @@ io.sockets.on('connection', function(socket){
             if(data.all) {
                 io.emit('system', data);
             }else{
-                io.to(socket.user.room).emit('system', data);
+                io.to(socket.user.room).emit('system', data.msg);
             }
 
 
         }catch(e){o.log(e.stack);}
     });
+
+    //新用户登录
     socket.on('user connect', function(user) {
         try
         {
+
+            if(is)
+
             socket.join(user.room);
-            o.log('正在发送用户列表给新用户...');
-            socket.emit('get users', list);
+            socket.emit('get users', users);
             o.log('用户列表发送完成!');
-            players[socket.id] = user;
-            s[socket.id] = socket;
-            //socket.emit('login', socket.id);
             socket.user = user;
             user.id = socket.id;
-            list.push(user);
-
+            users.push(user);
+            //console.log(io);
             socket.broadcast.emit('new user connect', user);
-            o.log('用户 ' + socket.user.name + ' 登录了！当前在线人数：' + String(list.length));
+            o.log('用户 ' + socket.user.name + ' 登录了！当前在线人数：' + String(socket.conn.server.clientsCount) + ', 使用的浏览器为: ' + socket.handshake.headers['user-agent']);
+
         }catch(e){o.log(e.stack);}
     });
+
+    //用户离开
     socket.on('disconnect', function(){
         try
         {
 
-            console.log(socket);
-            var msg = '用户 ' + socket.user.name + ' 退出了! 当前在线人数：';
             socket.broadcast.emit('user disconnect', socket.user);
-            players.splice(socket.id, 1);
-            s.splice(socket.id, 1);
             for(var i=0; i < list.length; i++) {
                 if(list[i].id == socket.id) {
-                    list.splice(i, 1);
+                    users.splice(i, 1);
                 }
             }
-            o.log(msg + String(list.length));
-
+            o.log('用户 ' + socket.user.name + ' 退出了! 当前在线人数：' + String(socket.conn.server.clientsCount));
 
         }catch(e){o.log(e.stack);}
     });

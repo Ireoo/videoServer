@@ -4,6 +4,13 @@
 $(function() {
 
     /**
+     *
+     * 调试代码
+     *
+     */
+    localStorage.debug='*';
+
+    /**
      * 连接服务器
      */
     var socket = io.connect("localhost:8000");
@@ -11,48 +18,40 @@ $(function() {
 
 
     socket.on('say to everyone', function(msg) {
-        if(msg.room == room) {
-            chatcom(msg.id, msg.avatar, msg.msg, msg.timer, false);
-        }
+
+        chatcom(msg.name, msg.avatar, msg.msg, msg.time, false);
+
     });
 
     socket.on('user disconnect', function(user) {
-        if(user.room == room) {
-            $('div.list li#' + user.id).remove();
-            console.log('div.list li#' + user.id);
-            systemmsg('用户 ' + user.name + ' 离开聊天室.');
-        }
+
+        $('div.list li#' + user.id).remove();
+        console.log('div.list li#' + user.id);
+        systemmsg('用户 ' + user.name + ' 离开聊天室.');
+
     });
 
     socket.on('new user connect', function(user) {
-        if(user.room == room) {
-            addplayer(user.id, user.name, user.avatar);
-            systemmsg('用户 ' + user.name + ' 进入聊天室.');
-        }
+
+        addplayer(user.id, user.name, user.avatar);
+        systemmsg('用户 ' + user.name + ' 进入聊天室.');
 
     });
 
     socket.on('get users', function(users) {
 
-        systemmsg('获取用户列表...');
-
         addplayer('', name + '(自己)', avatar);
         for(var i = 0; i < users.length; i++) {
-            if(users[i].room == room) {
-                addplayer(users[i].id, users[i].name, users[i].avatar);
-            }
+            addplayer(users[i].id, users[i].name, users[i].avatar);
         }
-
         systemmsg('获取用户列表完成.');
 
     });
 
-    socket.on('system', function(data) {
+    socket.on('system', function(msg) {
 
-        if(data.room == room || data.room == 0) {
-            systemmsg(data.msg);
-            //alert(data);
-        }
+        systemmsg(msg);
+        //alert(data);
 
     });
 
@@ -81,12 +80,7 @@ $(function() {
 
                 var timer = (new Date()).getTime();
                 socket.emit('say to everyone', {
-                    room  : room,
-                    id    : name,
-                    msg   : chatinput.val(),
-                    avatar: avatar,
-                    ip    : myip,
-                    timer : 0
+                    msg   : chatinput.val()
                 });
                 chatcom(name, avatar, chatinput.val(), timer, true);
                 chatinput.val('');
