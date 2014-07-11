@@ -30,7 +30,7 @@ server = http.createServer(function(req, res) {
 
 send404 = function(res){
     res.writeHead(404);
-    res.write('<b>404 Not Found</b>');
+    res.write('404 Not Found');
     res.end();
 };
 
@@ -38,7 +38,8 @@ server.listen(8000);
 
 var players = [];
 var s = [];
-var room = [];
+var rooms = [];
+var list = [];
 var videos = [];
 
 var io = require('socket.io')(server);
@@ -128,16 +129,21 @@ io.sockets.on('connection', function(socket){
     socket.on('login', function(user) {
         try
         {
-            room[user.room]++;
+            //if(!isNaN(room[user.room])) room[user.room] = 0;
+            //room[user.room] += 1;
             o.log('正在发送用户列表给新用户...');
-            socket.emit('getplayers', players);
+            socket.emit('getplayers', list);
             o.log('用户列表发送完成!');
             user.id = socket.id;
             players[socket.id] = user;
             s[socket.id] = socket;
+              
+            user.id = socket.id;
+            list.push(user);
+              
             socket.emit('login', socket.id);
             socket.broadcast.emit('loginIn', user);
-            o.log('用户 ' + user.name + ' 进入 ' + user.room + ' 了！房间 ' + players[socket.id].room + ' 在线人数: ' + room[players[socket.id].room] + ', 当前在线人数：' + String(players.length));
+            o.log('用户 ' + user.name + ' 进入 ' + user.room + ' 了！当前在线人数：' + String(list.length)); //房间 ' + players[socket.id].room + ' 在线人数: ' + String(room[user.room]) + ',
         }catch(e){o.log(e.stack);}
     });
 
@@ -150,12 +156,17 @@ io.sockets.on('connection', function(socket){
         try
         {
         
-            room[players[socket.id].room]--;
-            var msg = '用户 ' + players[socket.id].name + ' 离开 ' + players[socket.id].room + ' 了! 房间 ' + players[socket.id].room + ' 在线人数: ' + room[players[socket.id].room] + ', 当前在线人数：';
+            //room[players[socket.id].room] -= 1;
+            var msg = '用户 ' + players[socket.id].name + ' 离开 ' + players[socket.id].room + ' 了! 当前在线人数：';//房间 ' + players[socket.id].room + ' 在线人数: ' + String(room[players[socket.id].room]) + ',
             socket.broadcast.emit('change', players[socket.id]);
             players.splice(socket.id, 1);
             s.splice(socket.id, 1);
-            o.log(msg + String(players.length));
+            for(var i=0; i < list.length; i++) {
+              if(list[i].id == socket.id) {
+                list.splice(i, 1);
+              }
+            }
+            o.log(msg + String(list.length));
 
 
         }catch(e){o.log(e.stack);}
