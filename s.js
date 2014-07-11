@@ -38,6 +38,7 @@ server.listen(8000);
 
 var players = [];
 var s = [];
+var room = [];
 var videos = [];
 
 var io = require('socket.io')(server);
@@ -127,6 +128,7 @@ io.sockets.on('connection', function(socket){
     socket.on('login', function(user) {
         try
         {
+            room[user.room]++;
             o.log('正在发送用户列表给新用户...');
             socket.emit('getplayers', players);
             o.log('用户列表发送完成!');
@@ -135,7 +137,7 @@ io.sockets.on('connection', function(socket){
             s[socket.id] = socket;
             socket.emit('login', socket.id);
             socket.broadcast.emit('loginIn', user);
-            o.log('用户 ' + user.name + ' 登录了！当前在线人数：' + String(players.length));
+            o.log('用户 ' + user.name + ' 进入 ' + user.room + ' 了！房间 ' + players[socket.id].room + ' 在线人数: ' + room[players[socket.id].room] + ', 当前在线人数：' + String(players.length));
         }catch(e){o.log(e.stack);}
     });
 
@@ -148,7 +150,8 @@ io.sockets.on('connection', function(socket){
         try
         {
         
-            var msg = '用户 ' + players[socket.id].name + ' 退出了! 当前在线人数：';
+            room[players[socket.id].room]--;
+            var msg = '用户 ' + players[socket.id].name + ' 离开 ' + players[socket.id].room + ' 了! 房间 ' + players[socket.id].room + ' 在线人数: ' + room[players[socket.id].room] + ', 当前在线人数：';
             socket.broadcast.emit('change', players[socket.id]);
             players.splice(socket.id, 1);
             s.splice(socket.id, 1);
