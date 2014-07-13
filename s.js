@@ -1,10 +1,11 @@
 /**
- *  * Created with JetBrains WebStorm.
- *   * User: ultra
- *    * Date: 13-9-10
- *     * Time: 下午8:40
- *      * To change this template use File | Settings | File Templates.
- *       */
+ *
+ * Created with JetBrains WebStorm.
+ * User: S2
+ * Date: 13-9-10
+ * UpdateDate: 14-7-13
+ *
+ */
 
 var http = require('http'),
     url = require('url'),
