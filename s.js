@@ -79,8 +79,6 @@ io.on('connection', function(socket){
         try
         {
 
-            if(is)
-
             socket.join(user.room);
             socket.emit('get users', users);
             console.log('用户列表发送完成!');
