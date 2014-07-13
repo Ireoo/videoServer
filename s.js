@@ -10,6 +10,7 @@
 var http = require('http'),
     url = require('url'),
     fs = require('fs'),
+    o  = require('util'),
     server;
 
 server = http.createServer(function(req, res){
@@ -21,7 +22,7 @@ server = http.createServer(function(req, res){
 
     fs.readFile(__dirname + path, function(err, data){
         if (err) return send404(res);
-        console.log('[' + __dirname + path + ']状态: ' + String(err));
+        o.log('[' + __dirname + path + ']状态: ' + String(err));
         res.writeHead(200, {'Content-Type': 'text/javascript, charset=UTF-8'});
         //res.writeHead(200, {'Content-Type': path.substr(path.length - 2) == 'js' ? 'text/javascript, charset=UTF-8' : 'text/html, charset=UTF-8'});
         res.write(data, 'utf8');
@@ -38,7 +39,6 @@ send404 = function(res){
 server.listen(8000);
 
 var users = [];
-var videos = [];
 
 var io = require('socket.io')(server);
 io.set('log level', 1);
@@ -54,16 +54,16 @@ io.on('connection', function(socket){
             data.ip = socket.handshake.address.address;
             data.time = socket.handshake.time;
             socket.broadcast.to(socket.user.room).emit('say to everyone', data);
-            console.log(socket.user.name + ' say: ' + data.msg);
+            o.log(socket.user.name + ' say: ' + data.msg);
 
-        }catch(e){console.log(e.stack);}
+        }catch(e){o.log(e.stack);}
     });
 
     //系统信息
     socket.on('system', function(data){
         try
         {
-            console.log('[system]: ' + data.msg);
+            o.log('[system]: ' + data.msg);
             if(data.all) {
                 io.emit('system', data);
             }else{
@@ -71,7 +71,7 @@ io.on('connection', function(socket){
             }
 
 
-        }catch(e){console.log(e.stack);}
+        }catch(e){o.log(e.stack);}
     });
 
     //新用户登录
@@ -81,16 +81,16 @@ io.on('connection', function(socket){
 
             socket.join(user.room);
             socket.emit('get users', users);
-            console.log('用户列表发送完成!');
+            o.log('用户列表发送完成!');
             socket.user = user;
             user.id = socket.id;
             users.push(user);
             //console.log(io);
             socket.broadcast.emit('new user connect', user);
-            console.log('用户 ' + socket.user.name + ' 登录了！当前在线人数：' + String(socket.conn.server.clientsCount) + ', 使用的浏览器为: ' + socket.handshake.headers['user-agent']);
+            o.log('用户 ' + socket.user.name + ' 登录了！当前在线人数：' + String(socket.conn.server.clientsCount) + ', 使用的浏览器为: ' + socket.handshake.headers['user-agent']);
             console.log(socket.user);
 
-        }catch(e){console.log(e.stack);}
+        }catch(e){o.log(e.stack);}
     });
 
     //用户离开
@@ -104,9 +104,9 @@ io.on('connection', function(socket){
                     users.splice(i, 1);
                 }
             }
-            console.log('用户 ' + socket.user.name + ' 退出了! 当前在线人数：' + String(socket.conn.server.clientsCount));
+            o.log('用户 ' + socket.user.name + ' 退出了! 当前在线人数：' + String(socket.conn.server.clientsCount));
 
-        }catch(e){console.log(e.stack);}
+        }catch(e){o.log(e.stack);}
     });
 });
 
