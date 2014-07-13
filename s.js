@@ -88,6 +88,7 @@ io.on('connection', function(socket){
             //console.log(io);
             socket.broadcast.emit('new user connect', user);
             console.log('用户 ' + socket.user.name + ' 登录了！当前在线人数：' + String(socket.conn.server.clientsCount) + ', 使用的浏览器为: ' + socket.handshake.headers['user-agent']);
+            console.log(socket.user);
 
         }catch(e){console.log(e.stack);}
     });
@@ -109,8 +110,8 @@ io.on('connection', function(socket){
     });
 });
 
-var webRTC = require('webrtc.io').listen(8001);
+//var webRTC = require('webrtc.io').listen(8001);
 
 console.log('服务器已经启动，开始监听8000端口!');
-console.log('视频服务器已经启动，开始监听8001端口!');
+//console.log('视频服务器已经启动，开始监听8001端口!');
 
