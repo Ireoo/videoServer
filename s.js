@@ -39,6 +39,7 @@ send404 = function(res){
 server.listen(8000);
 
 var users = [];
+var zhubo = [];
 
 var io = require('socket.io')(server);
 io.set('log level', 1);
@@ -85,6 +86,9 @@ io.on('connection', function(socket){
             socket.user = user;
             user.id = socket.id;
             users.push(user);
+            if(user.zhubo == 1) {
+                zhobo.push(user);
+            }
             //console.log(io);
             socket.broadcast.emit('new user connect', user);
             o.log('用户 ' + socket.user.name + ' 登录了！当前在线人数：' + String(socket.conn.server.clientsCount) + ', 使用的浏览器为: ' + socket.handshake.headers['user-agent']);
@@ -102,6 +106,11 @@ io.on('connection', function(socket){
             for(var i=0; i < users.length; i++) {
                 if(users[i].id == socket.id) {
                     users.splice(i, 1);
+                }
+            }
+            for(var i=0; i < zhubo.length; i++) {
+                if(zhubo[i].id == socket.id) {
+                    zhubo.splice(i, 1);
                 }
             }
             o.log('用户 ' + socket.user.name + ' 退出了! 当前在线人数：' + String(socket.conn.server.clientsCount));
