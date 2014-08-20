@@ -39,6 +39,7 @@ send404 = function(res){
 server.listen(8000);
 
 var users = [];
+var giftMember = 0;
 
 var io = require('socket.io')(server);
 io.set('log level', 1);
@@ -75,7 +76,8 @@ io.on('connection', function(socket){
     socket.on('gift', function(data){
         try
         {
-            console.log(data);
+            giftMember += parseInt(data.member);
+            o.log(data.name + '送给' + data.room + '的主播 ' + data.member + ' 个 ' + data.gift + ' . 当前已经送出 ' + giftMember + ' 个礼物.');
             socket.broadcast.to(socket.user.room).emit('give gift', data);
             socket.emit('give gift', data);
         }catch(e){o.log(e.stack);}
