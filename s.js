@@ -94,7 +94,7 @@ io.on('connection', function(socket){
             socket.user = user;
             user.id = socket.id;
             users.push(user);
-            console.log(socket);
+            //console.log(socket);
             socket.broadcast.to(socket.user.room).emit('new user connect', user);
             o.log('用户 ' + socket.user.name + ' 登录了！当前在线人数：' + String(socket.conn.server.clientsCount) + ', 使用的浏览器为: ' + socket.handshake.headers['user-agent']);
             console.log(socket.user);
