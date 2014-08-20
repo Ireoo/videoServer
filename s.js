@@ -39,7 +39,6 @@ send404 = function(res){
 server.listen(8000);
 
 var users = [];
-var zhubo = [];
 
 var io = require('socket.io')(server);
 io.set('log level', 1);
@@ -54,7 +53,10 @@ io.on('connection', function(socket){
             data.avatar = socket.user.avatar;
             data.ip = socket.handshake.address.address;
             data.time = socket.handshake.time;
+            data.self = false;
             socket.broadcast.to(socket.user.room).emit('say to everyone', data);
+            data.self = true;
+            socket.emit('say to everyone', data);
             o.log(socket.user.name + ' say: ' + data.msg);
 
         }catch(e){o.log(e.stack);}
@@ -65,13 +67,17 @@ io.on('connection', function(socket){
         try
         {
             o.log('[system]: ' + data.msg);
-            if(data.all) {
-                io.emit('system', data);
-            }else{
-                io.to(socket.user.room).emit('system', data.msg);
-            }
+            io.emit('system', data);
+        }catch(e){o.log(e.stack);}
+    });
 
-
+    //礼物
+    socket.on('gift', function(data){
+        try
+        {
+            console.log(data);
+            socket.broadcast.to(socket.user.room).emit('give gift', data);
+            socket.emit('give gift', data);
         }catch(e){o.log(e.stack);}
     });
 
@@ -86,11 +92,8 @@ io.on('connection', function(socket){
             socket.user = user;
             user.id = socket.id;
             users.push(user);
-            if(user.zhubo == 1) {
-                zhobo.push(user);
-            }
-            //console.log(io);
-            socket.broadcast.emit('new user connect', user);
+            console.log(socket);
+            socket.broadcast.to(socket.user.room).emit('new user connect', user);
             o.log('用户 ' + socket.user.name + ' 登录了！当前在线人数：' + String(socket.conn.server.clientsCount) + ', 使用的浏览器为: ' + socket.handshake.headers['user-agent']);
             console.log(socket.user);
 
@@ -102,15 +105,10 @@ io.on('connection', function(socket){
         try
         {
 
-            socket.broadcast.emit('user disconnect', socket.user);
+            socket.broadcast.to(socket.user.room).emit('user disconnect', socket.user);
             for(var i=0; i < users.length; i++) {
                 if(users[i].id == socket.id) {
                     users.splice(i, 1);
-                }
-            }
-            for(var i=0; i < zhubo.length; i++) {
-                if(zhubo[i].id == socket.id) {
-                    zhubo.splice(i, 1);
                 }
             }
             o.log('用户 ' + socket.user.name + ' 退出了! 当前在线人数：' + String(socket.conn.server.clientsCount));
