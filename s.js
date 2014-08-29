@@ -96,7 +96,7 @@ io.on('connection', function(socket){
             users.push(user);
             //console.log(socket);
             socket.broadcast.to(socket.user.room).emit('new user connect', user);
-            o.log('用户 ' + socket.user.name + ' 登录了！当前在线人数：' + String(socket.conn.server.clientsCount) + ', 使用的浏览器为: ' + socket.handshake.headers['user-agent']);
+            o.log('用户 ' + socket.user.name + '     进入编号 [' + socket.user.room + '] 的房间！当前在线人数：' + String(socket.conn.server.clientsCount));
             //console.log(socket.user);
 
         }catch(e){o.log(e.stack);}
@@ -113,7 +113,7 @@ io.on('connection', function(socket){
                     users.splice(i, 1);
                 }
             }
-            o.log('用户 ' + socket.user.name + ' 退出了! 当前在线人数：' + String(socket.conn.server.clientsCount));
+            o.log('用户 ' + socket.user.name + ' 退出编号 [' + socket.user.room + '] 的房间! 当前在线人数：' + String(socket.conn.server.clientsCount));
 
         }catch(e){o.log(e.stack);}
     });
