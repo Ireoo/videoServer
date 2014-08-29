@@ -77,7 +77,7 @@ io.on('connection', function(socket){
         try
         {
             giftMember += parseInt(data.member);
-            o.log(data.name + '送给' + data.room + '的主播 ' + data.member + ' 个 ' + data.gift + ' . 当前已经送出 ' + giftMember + ' 个礼物.');
+            o.log(data.name + ' 送给 ' + data.toname + ' ' + data.member + ' 个 ' + data.gift + ' . 当前已经送出 ' + giftMember + ' 个礼物.');
             socket.broadcast.to(socket.user.room).emit('give gift', data);
             socket.emit('give gift', data);
         }catch(e){o.log(e.stack);}
@@ -90,13 +90,13 @@ io.on('connection', function(socket){
 
             socket.join(user.room);
             socket.emit('get users', users);
-            o.log('用户列表发送完成!');
+            //o.log('用户列表发送完成!');
             socket.user = user;
             user.id = socket.id;
             users.push(user);
             //console.log(socket);
             socket.broadcast.to(socket.user.room).emit('new user connect', user);
-            o.log('用户 ' + socket.user.name + ' 进入编号 [' + socket.user.room + '] 的房间！当前在线人数：' + String(socket.conn.server.clientsCount));
+            o.log('用户 ' + socket.user.name + ' 进入 ' + socket.user.toname + ' 的房间并发送用户列表！当前在线人数：' + String(socket.conn.server.clientsCount));
             //console.log(socket.user);
 
         }catch(e){o.log(e.stack);}
@@ -113,7 +113,7 @@ io.on('connection', function(socket){
                     users.splice(i, 1);
                 }
             }
-            o.log('用户 ' + socket.user.name + ' 退出编号 [' + socket.user.room + '] 的房间! 当前在线人数：' + String(socket.conn.server.clientsCount));
+            o.log('用户 ' + socket.user.name + ' 退出 ' + socket.user.toname + ' 的房间! 当前在线人数：' + String(socket.conn.server.clientsCount));
 
         }catch(e){o.log(e.stack);}
     });
