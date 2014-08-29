@@ -96,7 +96,7 @@ io.on('connection', function(socket){
             users.push(user);
             //console.log(socket);
             socket.broadcast.to(socket.user.room).emit('new user connect', user);
-            o.log('用户 ' + socket.user.name + '     进入编号 [' + socket.user.room + '] 的房间！当前在线人数：' + String(socket.conn.server.clientsCount));
+            o.log('用户 ' + socket.user.name + ' 进入编号 [' + socket.user.room + '] 的房间！当前在线人数：' + String(socket.conn.server.clientsCount));
             //console.log(socket.user);
 
         }catch(e){o.log(e.stack);}
