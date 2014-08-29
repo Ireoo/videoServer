@@ -11,7 +11,7 @@
   },
   "subdomain": "chatServer",
   "scripts": {
-    "start": "sNew.js"
+    "start": "s.js"
   },
   "author": "S2",
   "contributors": [
