@@ -6,7 +6,6 @@
     "node": ">= 0.6.0"
   },
   "dependencies": {
-    "webrtc.io": "latest",
     "socket.io": "latest"
   },
   "subdomain": "chatServer",
